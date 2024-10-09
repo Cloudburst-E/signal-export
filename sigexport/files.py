@@ -80,6 +80,8 @@ def copy_attachments(
     dest = Path(dest)
 
     for key, messages in convos.items():
+        if len(messages) == 0:
+            continue
         name = contacts[key].name
         log(f"\tCopying attachments for: {name}")
         # some contact names are None

@@ -41,10 +41,10 @@ def fetch_data(
     c.execute("PRAGMA cipher_hmac_algorithm = HMAC_SHA512")
     c.execute("PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA512")
 
-    query = "SELECT type, id, e164, name, profileName, members FROM conversations"
+    query = "SELECT type, id, serviceId, e164, name, profileName, profileFamilyName, profileFullName, members FROM conversations"
     c.execute(query)
     for result in c:
-        log(f"\tLoading SQL results for: {result[3]}, aka {result[4]}")
+        log(f"\tLoading SQL results for: {result[4]}, aka {result[7]}")
         members = []
         if result[5]:
             members = result[5].split(" ")
@@ -52,16 +52,19 @@ def fetch_data(
         cid = result[1]
         contacts[cid] = models.Contact(
             id=cid,
-            name=result[3],
+            service_id=result[2],
+            name=result[4],
             number=result[2],
-            profile_name=result[4],
+            profile_name=result[5],
+            profile_family_name=result[6],
+            profile_full_name=result[7],
             members=members,
             is_group=is_group,
         )
         if contacts[cid].name is None:
             contacts[cid].name = contacts[cid].profile_name
 
-        if not chats or (result[3] in chats_list or result[4] in chats_list):
+        if not chats or (result[4] in chats_list or result[5] in chats_list):
             convos[cid] = []
 
     query = "SELECT json, conversationId FROM messages ORDER BY sent_at"
@@ -75,6 +78,7 @@ def fetch_data(
             con = models.RawMessage(
                 conversation_id=res["conversationId"],
                 id=res["id"],
+                source_service_id=res.get("sourceServiceId"),
                 type=res.get("type"),
                 body=res.get("body", ""),
                 contact=res.get("contact"),
