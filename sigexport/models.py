@@ -12,6 +12,7 @@ from typing import Any
 class RawMessage:
     conversation_id: str
     id: str
+    source_service_id: str
 
     body: str
     type: str | None
@@ -49,9 +50,12 @@ class RawMessage:
 @dataclass
 class Contact:
     id: str
+    service_id: str 
     name: str
     number: str
     profile_name: str
+    profile_family_name: str
+    profile_full_name: str
     is_group: bool
     members: list[str] | None
 
@@ -97,8 +101,10 @@ class Attachment:
 
 @dataclass
 class Message:
+    id: str
     date: datetime
     sender: str
+    sender_id: str
     body: str
     quote: str
     sticker: str

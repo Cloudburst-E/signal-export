@@ -29,19 +29,20 @@ def create_message(
     body += "  "  # so that markdown newlines
 
     sender = "No-Sender"
-    if msg.type == "outgoing":
-        sender = "Me"
-    else:
-        try:
-            if is_group:
-                for c in contacts.values():
-                    num = c.number
-                    if num is not None and num == msg.source:
-                        sender = c.name
-            else:
-                sender = contacts[msg.conversation_id].name
-        except KeyError:
-            log(f"\t\tNo sender:\t\t{date}")
+
+    try:
+        if is_group:
+            for c in contacts.values():
+                num = c.number
+                sid = c.service_id
+                if sid is not None and sid == msg.source_service_id:
+                    sender = c.profile_full_name
+                elif num is not None and num == msg.source:
+                    sender = c.name
+        else:
+            sender = contacts[msg.conversation_id].profile_full_name
+    except KeyError:
+        log(f"\t\tNo sender:\t\t{date}")
 
     attachments: list[models.Attachment] = []
     for att in msg.attachments:
@@ -80,8 +81,10 @@ def create_message(
             pass
 
     return models.Message(
+        id=msg.id,
         date=date,
         sender=sender,
+        sender_id=msg.source_service_id,
         body=body,
         quote=quote,
         sticker=sticker,
@@ -96,6 +99,7 @@ def create_chats(
 ) -> models.Chats:
     """Convert convos and contacts into messages"""
     res: models.Chats = {}
+
     for key, raw_messages in convos.items():
         name = contacts[key].name
         log(f"\tDoing markdown for: {name}")

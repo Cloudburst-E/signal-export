@@ -119,6 +119,8 @@ def main(
     if html_output:
         html.prep_html(dest)
     for key, messages in chat_dict.items():
+        if len(messages) == 0:
+            continue
         name = contacts[key].name
         # some contact names are None
         if not name:
