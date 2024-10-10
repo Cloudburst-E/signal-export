@@ -87,7 +87,7 @@ def copy_attachments(
         # some contact names are None
         if not name:
             name = "None"
-        dst_root = dest / name / "media"
+        dst_root = dest / "media"
         dst_root.mkdir(exist_ok=True, parents=True)
         for msg in messages:
             if msg.attachments:
@@ -99,7 +99,7 @@ def copy_attachments(
                 )
                 for i, att in enumerate(attachments):
                     # Account for no fileName key
-                    file_name = str(att["fileName"]) if "fileName" in att else "None"
+                    file_name = str(att["fileName"]) if "fileName" in att else str(att.get("plaintextHash", ""))
                     # Sometimes the key is there but it is None, needs extension
                     if "." not in file_name:
                         content_type = att.get("contentType", "").split("/")

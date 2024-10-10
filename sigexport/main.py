@@ -6,7 +6,7 @@ from typing import Optional
 
 from typer import Argument, Context, Exit, Option, colors, run, secho
 
-from sigexport import create, data, files, html, logging, merge, utils
+from sigexport import create, data, files, logging, merge, utils
 
 OptionalPath = Optional[Path]
 OptionalStr = Optional[str]
@@ -18,17 +18,11 @@ def main(
     source: OptionalPath = Option(None, help="Path to Signal source directory"),
     old: OptionalPath = Option(None, help="Path to previous export to merge"),
     password: OptionalStr = Option(None, help="Linux-only. Password to decrypt DB key"),
-    paginate: int = Option(
-        100, "--paginate", "-p", help="Messages per page in HTML; set to 0 for infinite"
-    ),
     chats: str = Option(
         "", help="Comma-separated chat names to include: contact names or group names"
     ),
     json_output: bool = Option(
         True, "--json/--no-json", "-j", help="Whether to create JSON output"
-    ),
-    html_output: bool = Option(
-        True, "--html/--no-html", "-h", help="Whether to create HTML output"
     ),
     list_chats: bool = Option(
         False, "--list-chats", "-l", help="List available chats and exit"
@@ -113,11 +107,6 @@ def main(
         secho("No existing files will be deleted or overwritten!")
         chat_dict = merge.merge_with_old(chat_dict, contacts, dest, Path(old))
 
-    if paginate <= 0:
-        paginate = int(1e20)
-
-    if html_output:
-        html.prep_html(dest)
     for key, messages in chat_dict.items():
         if len(messages) == 0:
             continue
@@ -125,30 +114,15 @@ def main(
         # some contact names are None
         if not name:
             name = "None"
-        md_path = dest / name / "chat.md"
-        js_path = dest / name / "data.json"
-        ht_path = dest / name / "index.html"
+        js_path = dest / "data.json"
 
-        md_f = md_path.open("a", encoding="utf-8")
         js_f = js_path.open("a", encoding="utf-8")
-        ht_f = None
-        if html_output:
-            ht_f = ht_path.open("w", encoding="utf-8")
 
         try:
             for msg in messages:
-                print(msg.to_md(), file=md_f)
                 print(msg.dict_str(), file=js_f)
-            if html_output:
-                ht = html.create_html(
-                    name=name, messages=messages, msgs_per_page=paginate
-                )
-                print(ht, file=ht_f)
         finally:
-            md_f.close()
             js_f.close()
-            if ht_f:
-                ht_f.close()
 
     secho("Done!", fg=colors.GREEN)
 
