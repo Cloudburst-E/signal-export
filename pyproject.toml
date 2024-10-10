@@ -9,7 +9,7 @@ all = { chain = ["fmt", "lint", "check", "test"] }
 
 [project]
 name = "signal-export"
-description = "Export Signal conversations to Markdown and HTML"
+description = "Export Signal conversations to JSON"
 readme = "README.md"
 license = {text = "MIT License"}
 requires-python = ">= 3.9"
@@ -49,8 +49,8 @@ dev-dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/carderne/signal-export"
-repository = "https://github.com/carderne/signal-export"
+homepage = "https://github.com/cloudburst/signal-export"
+repository = "https://github.com/cloudburst/signal-export"
 
 [project.scripts]
 sigexport = "sigexport.main:cli"
