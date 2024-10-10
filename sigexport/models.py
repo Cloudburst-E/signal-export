@@ -101,6 +101,8 @@ class Attachment:
 
 @dataclass
 class Message:
+    chat_id: str
+    chat_name: str
     id: str
     date: datetime
     sender: str
