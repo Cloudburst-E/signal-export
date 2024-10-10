@@ -29,7 +29,7 @@ def create_message(
     body += "  "  # so that markdown newlines
 
     sender = "No-Sender"
-
+    chat_name = contacts[msg.conversation_id].name
     try:
         if is_group:
             for c in contacts.values():
@@ -81,6 +81,8 @@ def create_message(
             pass
 
     return models.Message(
+        chat_id=msg.conversation_id,
+        chat_name=chat_name,
         id=msg.id,
         date=date,
         sender=sender,
