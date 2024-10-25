@@ -28,16 +28,21 @@ This is converted to HTML at the end so it can be opened with any web browser. T
 1. Make sure you have Python installed.
 
 2. Install this package:
+If you want files to be uploaded directly to GCS, fill in values for environmental variables in `.local.env`, then run:
 ```bash
-pip install signal-export
+export $(cat .local.env | xargs)
+```
+Then pip install the package
+```bash
+pip install .
 ```
 
 3. Then run the script!
 ```bash
-sigexport ~/signal-chats
+sigexport ~/chat --overwrite --to-gcs
 
 # or for Windows:
-python -m sigexport C:\Temp\SignalExport
+python -m sigexport C:\Temp\SignalExport --overwrite --to-gcs
 ```
 
 ## 🪟 Installation: Windows

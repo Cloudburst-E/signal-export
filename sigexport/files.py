@@ -2,6 +2,7 @@ import base64
 import hashlib
 import hmac
 import shutil
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from typer import colors, secho
 
 from sigexport import models
 from sigexport.logging import log
+from sigexport.gcs import GCSClient
 
 CIPHER_KEY_SIZE = 32
 IV_SIZE = AES.block_size
@@ -17,7 +19,7 @@ MAC_KEY_SIZE = 32
 MAC_SIZE = hashlib.sha256().digest_size
 
 
-def decrypt_attachment(att: dict[str, str], src_path: Path, dst_path: Path) -> None:
+def decrypt_attachment(att: dict[str, str], src_path: Path, dst_path: Path, message: models.RawMessage, to_gcs: bool) -> None:
     """Decrypt attachment and save to `dst_path`.
 
     Code adapted from:
@@ -68,13 +70,17 @@ def decrypt_attachment(att: dict[str, str], src_path: Path, dst_path: Path) -> N
         raise ValueError("Invalid attachment data length")
 
     data_decrypted = decrypted_data[: att["size"]]
+
     with open(dst_path, "wb") as fp:
         fp.write(data_decrypted)
 
+    if to_gcs:
+        gcs_client = GCSClient()
+        gcs_client.upload_message_media_file(dst_path, f'{message.conversation_id}/{message.id}/{dst_path.name}')
+        os.remove(dst_path)
 
 def copy_attachments(
-    src: Path, dest: Path, convos: models.Convos, contacts: models.Contacts
-) -> None:
+    src: Path, dest: Path, convos: models.Convos, contacts: models.Contacts, to_gcs: bool) -> None:
     """Copy attachments and reorganise in destination directory."""
     src_root = Path(src) / "attachments.noindex"
     dest = Path(dest)
@@ -125,7 +131,7 @@ def copy_attachments(
                     dst_path = dst_root / att["fileName"]
                     if int(att.get("version", 0)) >= 2:
                         try:
-                            decrypt_attachment(att, src_path, dst_path)
+                            decrypt_attachment(att, src_path, dst_path, msg, to_gcs)
                         except ValueError as e:
                             secho(
                                 f"Failed to decrypt {src_path} error {e}, skipping",
@@ -133,7 +139,11 @@ def copy_attachments(
                             )
                     else:
                         try:
-                            shutil.copy2(src_path, dst_path)
+                            if not to_gcs:
+                                shutil.copy2(src_path, dst_path)
+                            else:
+                                gcs_client = GCSClient()
+                                gcs_client.upload_message_media_file(src_path, f'{msg.conversation_id}/{msg.id}/{dst_path.name}')
                         except FileNotFoundError:
                             secho(
                                 f"No file to copy at {src_path}, skipping!",

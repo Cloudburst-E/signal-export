@@ -3,10 +3,12 @@
 import shutil
 from pathlib import Path
 from typing import Optional
+import os
 
 from typer import Argument, Context, Exit, Option, colors, run, secho
 
 from sigexport import create, data, files, logging, merge, utils
+from sigexport.gcs import GCSClient
 
 OptionalPath = Optional[Path]
 OptionalStr = Optional[str]
@@ -34,6 +36,9 @@ def main(
         False,
         "--overwrite/--no-overwrite",
         help="Overwrite contents of output directory if it exists",
+    ),
+    to_gcs: bool = Option(
+        False, "--to-gcs", help="Upload attachments to Google Cloud Storage"
     ),
     verbose: bool = Option(False, "--verbose", "-v"),
     _: bool = Option(False, "--version", callback=utils.version_callback),
@@ -91,7 +96,7 @@ def main(
     contacts = utils.fix_names(contacts)
 
     secho("Copying and renaming attachments")
-    files.copy_attachments(source_dir, dest, convos, contacts)
+    files.copy_attachments(source_dir, dest, convos, contacts, to_gcs)
 
     if json_output and old:
         secho(
@@ -123,6 +128,11 @@ def main(
                 print(msg.dict_str(), file=js_f)
         finally:
             js_f.close()
+
+    if to_gcs:
+        gcs_client = GCSClient()
+        gcs_client.upload_message_media_file(dest / 'data.json', 'data.json', overwrite=True)
+        os.remove(js_path)
 
     secho("Done!", fg=colors.GREEN)
 
