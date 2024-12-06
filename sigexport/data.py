@@ -35,11 +35,21 @@ def fetch_data(
     db = dbapi2.connect(str(db_file))
     c = db.cursor()
     # param binding doesn't work for pragmas, so use a direct string concat
-    c.execute(f"PRAGMA KEY = \"x'{key}'\"")
-    c.execute("PRAGMA cipher_page_size = 4096")
-    c.execute("PRAGMA kdf_iter = 64000")
-    c.execute("PRAGMA cipher_hmac_algorithm = HMAC_SHA512")
-    c.execute("PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA512")
+    q = f"PRAGMA KEY = \"x'{key}'\""
+    print(q)
+    c.execute(q)
+    q = "PRAGMA cipher_page_size = 4096"
+    print(q)
+    c.execute(q)
+    q = "PRAGMA kdf_iter = 64000"
+    print(q)
+    c.execute(q)
+    q = "PRAGMA cipher_hmac_algorithm = HMAC_SHA512"
+    print(q)
+    c.execute(q)
+    q = "PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA512"
+    print(q)
+    c.execute(q)
 
     query = "SELECT type, id, serviceId, e164, name, profileName, profileFamilyName, profileFullName, members FROM conversations"
     c.execute(query)
