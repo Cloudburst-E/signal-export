@@ -86,16 +86,16 @@ def fetch_data(
             if res.get("type") in ["keychange", "profile-change"]:
                 continue
             con = models.RawMessage(
-                conversation_id=res["conversationId"],
+                conversation_id=res["conversation_id"],
                 id=res["id"],
-                source_service_id=res.get("sourceServiceId"),
+                source_service_id=res.get("source_service_id"),
                 type=res.get("type"),
                 body=res.get("body", ""),
                 contact=res.get("contact"),
                 source=res.get("source"),
                 timestamp=res.get("timestamp"),
                 sent_at=res.get("sent_at"),
-                server_timestamp=res.get("serverTimestamp"),
+                server_timestamp=res.get("server_timestamp"),
                 has_attachments=res.get("has_attachments", False),
                 attachments=res.get("attachments", []),
                 read_status=res.get("read_status"),
