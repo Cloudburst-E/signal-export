@@ -88,16 +88,16 @@ def fetch_data(
             print(f'RESULT: {res}')
             
             con = models.RawMessage(
-                conversation_id=res["conversation_id"],
+                conversation_id=res["conversationId"],
                 id=res["id"],
-                source_service_id=res.get("source_service_id"),
+                source_service_id=res.get("sourceServiceId"),
                 type=res.get("type"),
                 body=res.get("body", ""),
                 contact=res.get("contact"),
                 source=res.get("source"),
                 timestamp=res.get("timestamp"),
                 sent_at=res.get("sent_at"),
-                server_timestamp=res.get("server_timestamp"),
+                server_timestamp=res.get("serverTimestamp"),
                 has_attachments=res.get("has_attachments", False),
                 attachments=res.get("attachments", []),
                 read_status=res.get("read_status"),
