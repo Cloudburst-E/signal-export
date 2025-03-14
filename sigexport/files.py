@@ -137,6 +137,11 @@ def copy_attachments(
                                 f"Failed to decrypt {src_path} error {e}, skipping",
                                 fg=colors.MAGENTA,
                             )
+                        except FileNotFoundError:
+                            secho(
+                                f"No file to decrypt at {src_path}, skipping!",
+                                fg=colors.MAGENTA,
+                            )
                     else:
                         try:
                             if not to_gcs:
