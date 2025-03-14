@@ -85,7 +85,7 @@ def fetch_data(
         if cid and cid in convos:
             if res.get("type") in ["keychange", "profile-change"]:
                 continue
-            if len(res.keys()) == 0:
+            if res.get("conversationId") is None:
                 continue
             con = models.RawMessage(
                 conversation_id=res["conversationId"],
