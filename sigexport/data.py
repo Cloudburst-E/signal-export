@@ -77,7 +77,7 @@ def fetch_data(
         if not chats or (result[4] in chats_list or result[5] in chats_list):
             convos[cid] = []
 
-    query = "SELECT json, conversationId, id, sourceServiceId, type, body, source, timestamp, sent_at, serverTimestamp, hasAttachments, readStatus, seenStatus  FROM messages ORDER BY sent_at"
+    query = "SELECT json, conversationId, id, sourceServiceId, type, body, source, timestamp, sent_at, serverTimestamp, hasAttachments, readStatus, seenStatus FROM messages ORDER BY sent_at"
     c.execute(query)
     for result in c:
         res = json.loads(result[0])
@@ -87,7 +87,7 @@ def fetch_data(
                 continue
             con = models.RawMessage(
                 conversation_id=cid,
-                id=resut[2],
+                id=result[2],
                 source_service_id=result[3],
                 type=result[4],
                 body=result[5],
