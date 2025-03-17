@@ -77,31 +77,29 @@ def fetch_data(
         if not chats or (result[4] in chats_list or result[5] in chats_list):
             convos[cid] = []
 
-    query = "SELECT json, conversationId FROM messages ORDER BY sent_at"
+    query = "SELECT json, conversationId, id, sourceServiceId, type, body, source, timestamp, sent_at, serverTimestamp, hasAttachments, readStatus, seenStatus  FROM messages ORDER BY sent_at"
     c.execute(query)
     for result in c:
         res = json.loads(result[0])
         cid = result[1]
         if cid and cid in convos:
-            if res.get("type") in ["keychange", "profile-change"]:
-                continue
-            if res.get("conversationId") is None:
+            if result[4] in ["keychange", "profile-change"]:
                 continue
             con = models.RawMessage(
-                conversation_id=res["conversationId"],
-                id=res["id"],
-                source_service_id=res.get("sourceServiceId"),
-                type=res.get("type"),
-                body=res.get("body", ""),
+                conversation_id=cid,
+                id=resut[2],
+                source_service_id=result[3],
+                type=result[4],
+                body=result[5],
                 contact=res.get("contact"),
-                source=res.get("source"),
-                timestamp=res.get("timestamp"),
-                sent_at=res.get("sent_at"),
-                server_timestamp=res.get("serverTimestamp"),
-                has_attachments=res.get("has_attachments", False),
+                source=result[6],
+                timestamp=result[7],
+                sent_at=result[8],
+                server_timestamp=result[9],
+                has_attachments=result[10],
                 attachments=res.get("attachments", []),
-                read_status=res.get("read_status"),
-                seen_status=res.get("seen_status"),
+                read_status=result[11],
+                seen_status=result[12],
                 call_history=res.get("call_history"),
                 reactions=res.get("reactions", []),
                 sticker=res.get("sticker"),
