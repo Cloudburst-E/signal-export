@@ -49,8 +49,8 @@ class GCSClient:
 
         # Don't upload if it is already in GCS
         if blob.exists() and not overwrite:
-            logger.warning(f'GCS message media file already exists at {gcs_filepath} '
-                           f'(size {blob.size} bytes).')
+            #logger.warning(f'GCS message media file already exists at {gcs_filepath} '
+            #               f'(size {blob.size} bytes).')
             return
 
         # Upload the file to GCS
