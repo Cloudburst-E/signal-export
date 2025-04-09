@@ -119,7 +119,8 @@ def main(
         # some contact names are None
         if not name:
             name = "None"
-        js_path = dest / "data.json"
+        filename = f'{os.environ.get("SCRAPER", "data")}.json'
+        js_path = dest / filename
 
         js_f = js_path.open("a", encoding="utf-8")
 
@@ -131,7 +132,7 @@ def main(
 
     if to_gcs:
         gcs_client = GCSClient()
-        gcs_client.upload_message_media_file(dest / 'data.json', 'data.json', overwrite=True)
+        gcs_client.upload_message_media_file(dest / filename, filename, overwrite=True)
         os.remove(js_path)
 
     secho("Done!", fg=colors.GREEN)
