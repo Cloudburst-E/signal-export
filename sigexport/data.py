@@ -16,6 +16,7 @@ def fetch_data(
     password: Optional[str],
     chats: str,
     include_empty: bool,
+    gt: Optional[int],
 ) -> tuple[models.Convos, models.Contacts]:
     """Load SQLite data into dicts."""
     db_file = source_dir / "sql" / "db.sqlite"
@@ -77,7 +78,11 @@ def fetch_data(
         if not chats or (result[4] in chats_list or result[5] in chats_list):
             convos[cid] = []
 
-    query = "SELECT json, conversationId, id, sourceServiceId, type, body, source, timestamp, sent_at, serverTimestamp, hasAttachments, readStatus, seenStatus FROM messages ORDER BY sent_at"
+    query = "SELECT json, conversationId, id, sourceServiceId, type, body, source, timestamp, sent_at, serverTimestamp, hasAttachments, readStatus, seenStatus FROM messages"
+    if gt is not None:
+        query += f" WHERE sent_at > {gt}"
+    query += " ORDER BY sent_at"
+    log(f"\tExecuting query: {query}")
     c.execute(query)
     for result in c:
         res = json.loads(result[0])

@@ -12,6 +12,7 @@ from sigexport.gcs import GCSClient
 
 OptionalPath = Optional[Path]
 OptionalStr = Optional[str]
+OptionInt = Optional[int]
 
 
 def main(
@@ -39,6 +40,9 @@ def main(
     ),
     to_gcs: bool = Option(
         False, "--to-gcs", help="Upload attachments to Google Cloud Storage"
+    ),
+    gt: OptionInt = Option(
+        None, "--gt", help="Unix timestamp to filter messages greater than this"
     ),
     verbose: bool = Option(False, "--verbose", "-v"),
     _: bool = Option(False, "--version", callback=utils.version_callback),
@@ -74,6 +78,7 @@ def main(
         password=password,
         chats=chats,
         include_empty=include_empty,
+        gt=gt,
     )
 
     if list_chats:
